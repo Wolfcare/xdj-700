@@ -61,6 +61,60 @@ Goal: rebuild the mod from source with the project's own toolchain scripts and c
 
 How it was done: both cross-compilers were built with the project's `toolchains/build_sh.sh` and `toolchains/build_c6x.sh` (GCC 14.2.0 and binutils 2.43 from ftp.gnu.org; gpg reported good signatures from the GCC and binutils maintainers), then `python3 build.py` was run on macOS. The output is byte-for-byte the published build, so the compiled code in the patcher comes from the published source.
 
+## Security checks
+
+Run on 2026-11-09 against the local rebuild above. The firmware comparisons used scripts written for this check, not the project's own tools.
+
+### What the mod changes in the firmware file
+
+| Check | Result |
+|---|---|
+| Boot and recovery region (first 256 KB) | **Unchanged**: 0 bytes differ below `0x40000` |
+| Front-panel firmware component | **Unchanged**: byte-for-byte identical |
+| Error-log flash sector (`0x7E0000` and up) | **Not written**: no data at or above it |
+| S-record checksums, packed-application checksum | All valid; start address unchanged (`0xA0000000`) |
+| Stock data removed | None: every stock address is still present |
+| Header | Only the version tag changes, `1.15` to `1.16` |
+
+Inside Pioneer's unpacked application (18.6 MB), **116 bytes change, in 23 places**. Each one matches a change the project documents:
+
+| Address | Bytes | What it is |
+|---|---|---|
+| `0x080B8708` | 4 | 1 ms timer handler pointer, redirected to the panel guard |
+| `0x080D6294`, `0x080D62A4` | 10 | The two "Ver " texts emptied for the version label |
+| `0x08B74516` | 8 | The "unplayable" mark patch |
+| `0x08BF6220` to `0x08BFAC34` | 19 places | The 19 redirected PCM read/seek/end-of-file calls |
+| `0x08C01E78` | 12 | The jump at the playback dispatcher |
+| `0x08DD1A84`, `0x08DD2FEC` | 8 | The two version-label routine pointers |
+
+Every redirected pointer goes into the mod's own code, which is appended after the stock application (1,015,136 bytes, `0x091BD788` to `0x092B54E8`).
+
+### The patchers
+
+- **Regenerated from source:** running `tools/make_patcher.py` on the rebuild produced `patcher/xdj700_plus_patcher.html` and `patcher/xdj700_plus_patcher.py` byte-for-byte identical to the published ones.
+- **Web page:** its Content-Security-Policy is `default-src 'none'; connect-src 'none'; form-action 'none'`, so the browser itself blocks it from loading or sending anything. No `eval`, `fetch`, storage or external resources.
+- **Python script:** standard library only. It reads the file you name and writes only `XDJ700.UPD` files into its output folder. No network, no subprocess, no deletions. (`os.system("")` appears once; it's an empty call that turns on colour output in the Windows console.)
+
+### Parsing untrusted files
+
+The mod reads WAV, AIFF and FLAC files from USB sticks, and over LINK from other players. It runs with full access to the player's memory and there is no memory protection, so bugs in this parsing are the main risk.
+
+- **WAV and AIFF headers** (`xdj_pcm_open`): every header read is capped to a fixed 40-byte buffer; chunk count (32), chunk sizes and the AIFF `SSND` skip field are bounds-checked; only 16/24-bit, mono/stereo, linear PCM at the expected rates is accepted, with the block alignment checked against bits and channels. Sample reads stay within fixed buffers (at most 2,048 frames of at most 6 bytes into a 12,288-byte buffer). No out-of-bounds read or write found.
+- **FLAC decoding:** bundled dr_flac is **v0.13.3** (2026-01-17), the latest release. dr_flac is widely used and fuzzed upstream.
+- **The mod's own FLAC seek** (`xdj_parse_header_bytes`, `xdj_scan_frames`): every header field read is checked against the bytes available; frame sizes and positions are checked against the stream info; scanning has a probe limit.
+- **Audio-processor side** (`chip_flac.c`): ring-buffer reads are masked to the ring's size and refuse bytes the ring has already overwritten; the decoder's memory comes from a fixed arena that refuses oversized requests; each unit is capped at 640 frames.
+
+**Low-severity note:** the audio processor recognises the mod's tags by bit pattern inside the PCM stream. A deliberately crafted 16-bit WAV could imitate a run of tags while a FLAC track is loaded. The worst outcome found is wrong audio or silence from that track: tag numbers are masked and reads stay inside the ring, so no memory corruption.
+
+### The project's own test suite
+
+`python3 -m unittest discover -s tests`, with sox, flac, ffmpeg and Node installed: **55 tests, all passed, 1 skipped**. These run the adapter, feed, converter and decoder code on the computer against models of the player's file calls and of the audio processor's memory, and compare the output with reference decodes. The one skip (`test_firmware_differential_invariants`) looks for a build file under an older name (`build/XDJ700_MOD_FLAC.UPD`); the independent firmware comparison above covers the same ground.
+
+### Limits of these checks
+
+- This was a focused review of the parsing paths, not a line-by-line audit of all ~10,000 lines of mod code, and not fuzzing.
+- Stability under real use (the documented edge cases at high pitch and fast jog spinning) can only be tested on a player.
+
 ## Verdict
 
 For a hobby firmware mod, it is unusually careful work: the changes are small and documented, the boot region is left alone, there are hash checks throughout, and the build is meant to be reproducible. The precompiled code in the patcher was the main open question, and the build check above settles it: a clean rebuild from source reproduces the published build exactly. What remains is the risk of any firmware flash, and the limited testing (two players).
