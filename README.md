@@ -2,6 +2,21 @@
 
 Notes on [lowtrustsociety/XDJ-700-PLUS](https://github.com/lowtrustsociety/XDJ-700-PLUS), an unofficial firmware mod for the Pioneer DJ XDJ-700 (release PLUS V0.90, 2026-10-30, GPL-3.0). This repository holds only this analysis: no mod code, and no Pioneer firmware.
 
+## Credits
+
+**XDJ-700 PLUS is the work of [low trust society](https://github.com/lowtrustsociety)**, who designed, built and tested it over two months and more than 70 builds. All the mod's code, the patchers and the documentation are theirs. This repository only adds an independent review of their work and a verification package for passing their patcher on.
+
+- Original project: [github.com/lowtrustsociety/XDJ-700-PLUS](https://github.com/lowtrustsociety/XDJ-700-PLUS)
+- Support the author: [ko-fi.com/lowtrustsociety](https://ko-fi.com/lowtrustsociety)
+- FLAC decoding: [dr_flac](https://github.com/mackron/dr_libs) by David Reid
+- XDJ-700 and its firmware: Pioneer DJ / AlphaTheta. This project is not affiliated with them.
+
+Bug reports and unplayable files go to the [original project's issues](https://github.com/lowtrustsociety/XDJ-700-PLUS/issues), not here.
+
+## Verification package
+
+[`distribution/XDJ-700-PLUS-V0.90/`](distribution/XDJ-700-PLUS-V0.90/) holds the author's patcher (unchanged, GPL-3.0), its hashes, this report, and step-by-step instructions for checking everything independently. Start with [`READ_ME_FIRST.txt`](distribution/XDJ-700-PLUS-V0.90/READ_ME_FIRST.txt). It contains no Pioneer firmware.
+
 ## What the mod does
 
 It patches the official XDJ-700 firmware 1.15 to play formats the stock player refuses:

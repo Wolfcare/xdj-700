@@ -4,3 +4,5 @@
 *.zip
 firmware_extract/
 .DS_Store
+patcher/
+xdj700_plus/
