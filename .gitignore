@@ -1,0 +1,6 @@
+# Pioneer firmware and anything built from it
+*.UPD
+*.upd
+*.zip
+firmware_extract/
+.DS_Store
