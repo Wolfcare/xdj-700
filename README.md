@@ -57,8 +57,10 @@ Goal: rebuild the mod from source with the project's own toolchain scripts and c
 |---|---|
 | Official firmware 1.15 `XDJ700.UPD` (input) | `73edec9802da51672257c2599efc04209dc92478fcbaa1a0425b3b122e33f99c`, matched |
 | Published mod build (expected output) | `84f7f0653a4c66cf5b902edf1d837989e443ab5ab3462aa0ffed8b6530076f56` |
-| Local rebuild | pending |
+| Local rebuild (2026-11-09) | `84f7f0653a4c66cf5b902edf1d837989e443ab5ab3462aa0ffed8b6530076f56`, **matched** |
+
+How it was done: both cross-compilers were built with the project's `toolchains/build_sh.sh` and `toolchains/build_c6x.sh` (GCC 14.2.0 and binutils 2.43 from ftp.gnu.org; gpg reported good signatures from the GCC and binutils maintainers), then `python3 build.py` was run on macOS. The output is byte-for-byte the published build, so the compiled code in the patcher comes from the published source.
 
 ## Verdict
 
-For a hobby firmware mod, it is unusually careful work: the changes are small and documented, the boot region is left alone, there are hash checks throughout, and the build is meant to be reproducible. The main thing a user trusts is the precompiled code in the patcher, which the build check above verifies.
+For a hobby firmware mod, it is unusually careful work: the changes are small and documented, the boot region is left alone, there are hash checks throughout, and the build is meant to be reproducible. The precompiled code in the patcher was the main open question, and the build check above settles it: a clean rebuild from source reproduces the published build exactly. What remains is the risk of any firmware flash, and the limited testing (two players).
