@@ -19,15 +19,27 @@ you. Everything below can be checked independently.
 WHAT IS IN THIS FOLDER
 ----------------------
 
-  xdj700_plus_patcher.html   The patcher, as a web page (works offline)
-  xdj700_plus_patcher.py     The same patcher as a Python 3 script
-  LICENSE                    GNU GPL v3, the patcher's licence
-  SHA256SUMS.txt             Hashes of the files above
-  VERIFICATION_REPORT.md     The checks that were run, and their results
-  READ_ME_FIRST.txt          This file
+  xdj700_plus_patcher_reworded.html  The patcher with clearer wording.
+                                     Start here.
+  xdj700_plus_patcher.html           The author's original patcher,
+                                     unchanged
+  xdj700_plus_patcher.py             The author's patcher as a Python 3
+                                     script, unchanged
+  reword_patcher.py                  Turns the original page into the
+                                     reworded one (text only)
+  fwcheck.py                         Shows what any modified firmware file
+                                     changes compared with the official one
+  LICENSE                            GNU GPL v3
+  SHA256SUMS.txt                     Hashes of the files above
+  VERIFICATION_REPORT.md             The checks that were run, and their
+                                     results
+  READ_ME_FIRST.txt                  This file
 
 There is NO Pioneer firmware in here. You download the official firmware
 yourself, and the patcher modifies it on your own computer.
+
+Both web pages make exactly the same files. The reworded one only explains
+things more plainly: same code, same checks, same result.
 
 
 STEP 1: CHECK THE PATCHER IS THE PUBLISHED ONE
@@ -39,7 +51,7 @@ macOS / Linux, in a terminal inside this folder:
 
 Windows (PowerShell), inside this folder:
 
-    Get-FileHash xdj700_plus_patcher.html, xdj700_plus_patcher.py -Algorithm SHA256
+    Get-FileHash * -Algorithm SHA256
 
 Then don't trust SHA256SUMS.txt either. The easiest independent check is the
 author's release page:
@@ -59,6 +71,19 @@ the commit above:
 Download them (the "Raw" button) and hash them the same way. If any hash
 differs, stop and don't use this package.
 
+To check the reworded page, make it yourself from the original:
+
+    python3 reword_patcher.py xdj700_plus_patcher.html my_copy.html
+
+It refuses anything but the original release file, and prints the hash of
+the page it makes. That must be:
+
+    c5054fc2f402826b0d809f427463f7da8215ea1561f2762bdf515b6139251f38
+
+reword_patcher.py is short and readable: every change is an exact text
+replacement listed in it, and none touches the page's code. If you'd rather
+not trust it at all, use the original page instead.
+
 
 STEP 2: GET THE OFFICIAL FIRMWARE YOURSELF
 ------------------------------------------
@@ -72,11 +97,12 @@ get XDJ700.UPD. Its SHA-256 must be:
 The patcher checks this too and refuses any other file.
 
 
-STEP 3: BUILD THE MOD
----------------------
+STEP 3: MAKE THE MOD
+--------------------
 
-Open xdj700_plus_patcher.html in a browser and drop your XDJ700.UPD on it.
-Read the notice, tick the box, press "build the mod". It saves a zip with:
+Open xdj700_plus_patcher_reworded.html in a browser and drop your
+XDJ700.UPD on it. Press "Make the mod", read the notice, tick the box and
+press "Make the mod" again. It saves a zip with:
 
     1_mod/XDJ700.UPD             the mod
     2_stock_restore/XDJ700.UPD   official 1.15 again, to go back
@@ -86,7 +112,7 @@ Expected hashes of the results:
     mod      84f7f0653a4c66cf5b902edf1d837989e443ab5ab3462aa0ffed8b6530076f56
     restore  d71006018c8e2889be5517b0b1c853cea92b6373196c8c2f7040c25c822b0a09
 
-The patcher only hands out the mod if it matches the first hash exactly.
+The page only hands out the mod if it matches the first hash exactly.
 
 The web page cannot go online: its Content-Security-Policy blocks all
 network access, so your firmware never leaves your computer. You can test
@@ -96,15 +122,25 @@ If you prefer the terminal:
 
     python3 xdj700_plus_patcher.py /path/to/XDJ700.UPD
 
+Optional: see for yourself what the mod changes.
 
-STEP 4: FLASH IT
-----------------
+    python3 fwcheck.py /path/to/official/XDJ700.UPD 1_mod/XDJ700.UPD
+
+It should show the boot and recovery region and the front panel firmware
+unchanged, 23 small edits to Pioneer's code, and the mod's own code added
+after it.
+
+
+STEP 4: UPDATE THE PLAYER
+-------------------------
 
 1. Keep 2_stock_restore/XDJ700.UPD safe, ideally on a second USB stick.
-2. Copy 1_mod/XDJ700.UPD to the top folder of a FAT32 USB stick.
+2. Copy XDJ700.UPD from the 1_mod folder onto a FAT32 USB stick, directly,
+   not inside a folder.
 3. Player off. Insert the stick. Hold IN + RELOOP/EXIT, switch on, keep
    holding until the update screen appears.
-4. Wait until it restarts by itself. Never cut the power during an update.
+4. Wait until it restarts by itself. Never cut the power or remove the
+   stick during an update.
 
 UTILITY then shows PLUS V0.90. To go back to stock, do the same with the
 restore file.
@@ -114,8 +150,9 @@ CREDITS
 -------
 
 XDJ-700 PLUS, including both patchers in this folder, is the work of
-low trust society. They designed, built and tested it; this package only
-passes their patcher on unchanged, with a review and a way to check it.
+low trust society. They designed, built and tested it. This package passes
+their patcher on unchanged, plus a copy with reworded text, a review, and
+ways to check it.
 
     Project:   https://github.com/lowtrustsociety/XDJ-700-PLUS
     Support:   https://ko-fi.com/lowtrustsociety
@@ -124,7 +161,7 @@ passes their patcher on unchanged, with a review and a way to check it.
 FLAC decoding uses dr_flac by David Reid. The XDJ-700 and its firmware are
 Pioneer DJ / AlphaTheta's; neither is involved with this mod.
 
-Verification package and review: Wolfcare.
+Verification package, reworded page, fwcheck.py and review: Wolfcare.
 
 
 THE STRONGEST CHECK: BUILD IT YOURSELF

@@ -15,7 +15,16 @@ Bug reports and unplayable files go to the [original project's issues](https://g
 
 ## Verification package
 
-This folder holds the author's patcher (unchanged, GPL-3.0), its hashes, this report, and step-by-step instructions for checking everything independently. Start with `READ_ME_FIRST.txt`. It contains no Pioneer firmware.
+This folder holds the author's patcher (unchanged, GPL-3.0), a copy with clearer wording, its hashes, this report, and step-by-step instructions for checking everything independently. Start with `READ_ME_FIRST.txt`. It contains no Pioneer firmware.
+
+## Tools
+
+- `fwcheck.py` compares an official firmware file with a modified one and shows what changed: boot and recovery region, front-panel firmware, small edits (hooks) in the stock code, and whether new code went into empty space or over stock content. It works with XDJ-700 (`XDJ700.UPD`) and CDJ-2000 (`C2KMAIN.UPD`, `C2KGUI.UPD`) files. Python 3.8 or later, standard library only; it only reads files.
+
+      python3 fwcheck.py OFFICIAL.UPD MODIFIED.UPD
+      python3 fwcheck.py --identify FILE.UPD
+
+- `reword_patcher.py` makes the reworded patcher page from the author's original V0.90 release file. It only does exact text replacements, all listed in the script, and refuses any other input, so anyone can reproduce the reworded page (SHA-256 `c5054fc2f402826b0d809f427463f7da8215ea1561f2762bdf515b6139251f38`). Tested: the reworded page's code, run on the official 1.15 firmware, makes exactly the tested mod and restore files.
 
 ## What the mod does
 
