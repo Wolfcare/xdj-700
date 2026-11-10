@@ -41,8 +41,17 @@ Windows (PowerShell), inside this folder:
 
     Get-FileHash xdj700_plus_patcher.html, xdj700_plus_patcher.py -Algorithm SHA256
 
-Then don't trust SHA256SUMS.txt either. Compare against the copies in the
-project's own repository at the commit above:
+Then don't trust SHA256SUMS.txt either. The easiest independent check is the
+author's release page:
+
+    https://github.com/lowtrustsociety/XDJ-700-PLUS/releases/tag/v0.90
+
+GitHub shows a sha256 next to xdj700_plus_patcher.html there. It must be:
+
+    4c64956982c447ce4d4b97981e2d3ce2fb7eb956b74f5ad940faf3747eb38781
+
+You can also compare against the copies in the project's own repository at
+the commit above:
 
     https://github.com/lowtrustsociety/XDJ-700-PLUS/blob/154d6dcff2f300ea88eafe750355cf98507890d7/patcher/xdj700_plus_patcher.html
     https://github.com/lowtrustsociety/XDJ-700-PLUS/blob/154d6dcff2f300ea88eafe750355cf98507890d7/patcher/xdj700_plus_patcher.py
